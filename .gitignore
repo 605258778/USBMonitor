@@ -1,0 +1,5 @@
+USBMonitor/bin/Debug/USBMonitorData
+USBMonitor/bin/Release/USBMonitorData
+USBMonitor/bin/Debug
+*.pdb
+*.cache

@@ -1,0 +1,43 @@
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe.config
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.pdb
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Host.resources
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Setting.resources
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Properties.Resources.resources
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.GenerateResource.Cache
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.pdb
+C:\Work Station\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.csprojResolveAssemblyReference.cache
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe.config
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.pdb
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.pdb
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.csprojResolveAssemblyReference.cache
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Host.resources
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Setting.resources
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Properties.Resources.resources
+C:\Work Station\OneDrive\WebProject\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.GenerateResource.Cache
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe.config
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.pdb
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\bin\Release\USBMonitor.pdb
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.csprojResolveAssemblyReference.cache
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Host.resources
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Setting.resources
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.Properties.Resources.resources
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.GenerateResource.Cache
+C:\Users\wmzhi\Desktop\OneDrive\C# Projects\USBMonitor\USBMonitor\obj\Release\USBMonitor.diskUUID.resources
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe.config
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.pdb
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csprojResolveAssemblyReference.cache
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.diskUUID.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.Host.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.Setting.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.Properties.Resources.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.GenerateResource.Cache
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.pdb
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.ResolveComReference.cache
