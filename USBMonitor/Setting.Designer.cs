@@ -121,7 +121,7 @@
             this.version.Name = "version";
             this.version.Size = new System.Drawing.Size(118, 15);
             this.version.TabIndex = 18;
-            this.version.Text = "Version：1.0.0";
+            this.version.Text = "Version：";
             // 
             // label3
             // 
