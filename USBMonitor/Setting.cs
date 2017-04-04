@@ -23,11 +23,6 @@ namespace USBMonitor
             multirun.Checked = Properties.Settings.Default.multirun;
         }
 
-        private void logButton_Click(object sender, EventArgs e)
-        {
-            host.openLogFile();
-        }
-
         private void dirDialogButton_Click(object sender, EventArgs e)
         {
             if(folderBrowser.ShowDialog() == DialogResult.OK)
@@ -39,11 +34,6 @@ namespace USBMonitor
         private void fileButton_Click(object sender, EventArgs e)
         {
             host.openFile();
-        }
-
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            host.openBlog();
         }
 
         private void saveButton_Click(object sender, EventArgs e)
@@ -116,16 +106,6 @@ namespace USBMonitor
         private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
 
-        }
-
-        private void linkLabel4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            host.openPage();
-        }
-
-        private void linkLabel5_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            host.openPage();
         }
 
         private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

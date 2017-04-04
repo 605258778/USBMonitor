@@ -21,7 +21,15 @@ namespace USBMonitor
         public string[] blackdisk;
         public string[] blackid;
         Hashtable diskMap = new Hashtable();
+        public string disk;
         public Dictionary<string, Thread> copyThread = new Dictionary<string, Thread>(); //正在复制文件的线程 分区号=>线程
+
+        /****************引入系统相关API******************/
+        [DllImport("user32.dll")]
+        public static extern bool AddClipboardFormatListener(IntPtr hwnd);
+
+        [DllImport("user32.dll")]
+        public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
 
         public Host()
         {
@@ -74,6 +82,7 @@ namespace USBMonitor
             {
                 white = new string[0];
             }
+            AddClipboardFormatListener(this.Handle);
             nicon.Visible = Program.showicon;
             if (!Properties.Settings.Default.multirun)
             {
@@ -163,10 +172,16 @@ namespace USBMonitor
         public const int DBT_DEVICEQUERYREMOVEFAILED = 0x8002;  //请求删除一个设备或媒体片已被取消。
         public const int DBT_DEVICEREMOVECOMPLETE = 0x8004;  //一个设备或媒体片已被删除。
         public const int DBT_DEVICEREMOVEPENDING = 0x8003;  //一个设备或媒体一块即将被删除。不能否认的。
+        public const int WM_CLIPBOARDUPDATE = 0x031D; //粘贴板
 
         protected override void DefWndProc(ref Message m)
         {
-            if (m.Msg == WM_DEVICECHANGE)
+            if(m.Msg == WM_CLIPBOARDUPDATE)
+            {
+                this.setSingleThread();
+                
+            }
+            else if (m.Msg == WM_DEVICECHANGE)
             {
                 
                 int wp = m.WParam.ToInt32();
@@ -179,7 +194,7 @@ namespace USBMonitor
                         if (dbv.dbcv_flags == 0)
                         {
                             char[] volums = GetVolumes(dbv.dbcv_unitmask);
-                            string disk = volums[0].ToString() + ":";
+                            disk = volums[0].ToString() + ":";
 
 
                             string path = dir+"USB接口使用记录.xlsx";
@@ -190,6 +205,7 @@ namespace USBMonitor
 
                             if (wp == DBT_DEVICEARRIVAL) //存储设备插入
                             {
+                                
                                 Console.WriteLine(dir);
                                 ManagementObject diskinfo = new ManagementObject("win32_logicaldisk.deviceid=\"" + disk + "\"");
                                 string diskser = "";
@@ -234,6 +250,7 @@ namespace USBMonitor
                                     diskClass diskStr = (diskClass)diskMap[disk];
                                     this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拔出");
                                     diskMap.Remove(disk);
+                                    RemoveClipboardFormatListener(this.Handle);
                                 }
                                 catch (Exception) { }
                             }
@@ -289,82 +306,6 @@ namespace USBMonitor
             public UInt16 dbcv_flags;
         }
 
-        /// <summary>
-        /// 复制文件夹（及文件夹下所有子文件夹和文件）
-        /// </summary>
-        /// <param name="sourcePath">待复制的文件夹路径</param>
-        /// <param name="destinationPath">目标路径</param>
-        public void CopyDirectory(string sourcePath, string destinationPath)
-        {
-            try
-            {
-                DirectoryInfo info = new DirectoryInfo(sourcePath);
-                Directory.CreateDirectory(destinationPath);
-                foreach (FileSystemInfo fsi in info.GetFileSystemInfos())
-                {
-                    String destName = Path.Combine(destinationPath, fsi.Name);
-
-                    if (fsi is FileInfo)
-                    {   //如果是文件，复制文件
-                        try
-                        {
-                            FileInfo fi1 = new FileInfo(fsi.FullName);
-                            if (checkExt(fi1.Extension))
-                            {
-                                Program.log("复制文件：" + fsi.FullName);
-                                if (File.Exists(destName))
-                                {
-                                    switch (Properties.Settings.Default.conflict)
-                                    {
-                                        case 0:
-                                            FileInfo fi2 = new FileInfo(destName);
-                                            if (fi1.LastWriteTime > fi2.LastWriteTime)
-                                            {
-                                                File.Copy(fsi.FullName, destName, true);
-                                            }
-                                            break;
-                                        case 1:
-                                            destName = (new Random()).Next(0, 9999999) + "-" + destName;
-                                            File.Copy(fsi.FullName, destName);
-                                            break;
-                                        case 2:
-                                            File.Copy(fsi.FullName, destName, true);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    File.Copy(fsi.FullName, destName);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Program.log("复制文件：" + destName + "：失败：" + ex.ToString(), 2);
-                        }
-                    }
-                    else //如果是文件夹，新建文件夹，递归
-                    {
-                        try
-                        {
-                            Directory.CreateDirectory(destName);
-                            CopyDirectory(fsi.FullName, destName);
-                        }
-                        catch (Exception ex)
-                        {
-                            Program.log("创建目录：" + destName + "：失败：" + ex.ToString(), 2);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Program.log("复制目录失败，设备可能被强行拔出：" + ex.ToString());
-            }
-        }
-
         private bool checkExt(string ext)
         {
             if (string.IsNullOrEmpty(ext) && Properties.Settings.Default.copynoext) return true;
@@ -391,27 +332,6 @@ namespace USBMonitor
         private void HideHToolStripMenuItem_Click(object sender, EventArgs e)
         {
             nicon.Visible = nicon.Visible ? false : true;
-        }
-
-        private void LogToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            openLogFile();
-        }
-
-        public void openLogFile()
-        {
-            if (!File.Exists(dir + "EventViewer.xml"))
-            {
-                File.WriteAllText(dir + "EventViewer.xml", Properties.Resources.EventViewer);
-            }
-            try
-            {
-                Process.Start("eventvwr.exe", "/v:\"" + dir + "EventViewer.xml" + "\"");
-            }
-            catch (Exception ex)
-            {
-                error("打开日志查看器失败：" + ex.ToString());
-            }
         }
 
         private void SettingToolStripMenuItem_Click(object sender, EventArgs e)
@@ -446,32 +366,6 @@ namespace USBMonitor
                 error("打开失败：" + ex.ToString());
             }
         }
-
-        public void openBlog()
-        {
-            
-        }
-
-        private void BlogMenuItem_Click(object sender, EventArgs e)
-        {
-            openBlog();
-        }
-
-        private void nameMenuItem_Click(object sender, EventArgs e)
-        {
-            openPage();
-        }
-
-        public void openPage()
-        {
-           
-        }
-
-        private void nicon_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-
-        }
-
         private void clearLog_Click(object sender, EventArgs e)
         {
             Program.logger.Clear();
@@ -489,7 +383,13 @@ namespace USBMonitor
             app.Visible = false;
             Excel.Workbook workBook = app.Workbooks.Add(Nothing);
             Excel.Worksheet worksheet = (Excel.Worksheet)workBook.Sheets[1];
+            Excel.Range range = (Excel.Range)worksheet.get_Range("A1", "D1");
+            range.Font.Size = 15;
+            range.Font.Name = "黑体";
             worksheet.Name = "record";
+            range.ColumnWidth = 15;
+            range.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
             //headline  
             worksheet.Cells[1, 1] = "设备名称";
             worksheet.Cells[1, 2] = "发生时间";
@@ -522,6 +422,39 @@ namespace USBMonitor
             mybook = null;
             //quit excel app  
             app.Quit();
+        }
+        public void setSingleThread()
+        {
+            Thread thread1 = new Thread(new ThreadStart(getData));
+            thread1.SetApartmentState(ApartmentState.STA);     //<--
+            thread1.Start();
+        }
+        public void getData()
+        {
+            try
+            {
+                //根据.net自带Clipboard类，获取裁切板中的数据
+                if (Clipboard.ContainsFileDropList())
+                {
+                    System.Collections.Specialized.StringCollection file = Clipboard.GetFileDropList();
+                    IList fileIList = (IList)file;
+                    if (fileIList.Count > 0)
+                    {
+                        Console.WriteLine(fileIList[0]);
+                        String path = fileIList[0].ToString();
+                        if (path.StartsWith(disk))
+                        {
+                            Console.WriteLine("U盘数据被复制");
+                            diskClass diskStr = (diskClass)diskMap[disk];
+                            this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "复制:"+ path);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
     }
     public partial class diskClass{

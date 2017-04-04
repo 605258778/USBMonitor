@@ -100,7 +100,6 @@
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "作者：信息室Zengw";
             this.linkLabel1.VisitedLinkColor = System.Drawing.Color.SteelBlue;
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
             // hidemsg
             // 
@@ -145,7 +144,6 @@
             this.linkLabel4.TabStop = true;
             this.linkLabel4.Text = "USBMonitor";
             this.linkLabel4.VisitedLinkColor = System.Drawing.Color.SteelBlue;
-            this.linkLabel4.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel4_LinkClicked);
             // 
             // autorun
             // 

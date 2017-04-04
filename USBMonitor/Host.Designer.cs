@@ -54,7 +54,6 @@ namespace USBMonitor
             this.nicon.BalloonTipTitle = "USBMonitor";
             this.nicon.ContextMenuStrip = this.niconMenu;
             this.nicon.Text = "USBMonitor";
-            this.nicon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.nicon_MouseDoubleClick);
             // 
             // niconMenu
             // 
@@ -80,7 +79,6 @@ namespace USBMonitor
             this.BlogMenuItem.Name = "BlogMenuItem";
             this.BlogMenuItem.Size = new System.Drawing.Size(181, 26);
             this.BlogMenuItem.Text = "作者：信息室";
-            this.BlogMenuItem.Click += new System.EventHandler(this.BlogMenuItem_Click);
             // 
             // toolStripSeparator5
             // 

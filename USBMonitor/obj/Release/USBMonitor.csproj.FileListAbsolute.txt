@@ -1,0 +1,12 @@
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe.config
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.ResolveComReference.cache
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.pdb
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csprojResolveAssemblyReference.cache
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.diskUUID.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.Host.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.Setting.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.Properties.Resources.resources
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.GenerateResource.Cache
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.pdb
