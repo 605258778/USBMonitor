@@ -44,6 +44,8 @@ namespace USBMonitor
             this.HideHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ExitXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stop = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.niconMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,6 +65,8 @@ namespace USBMonitor
             this.toolStripSeparator5,
             this.EnableToolStripMenuItem,
             this.toolStripSeparator2,
+            this.stop,
+            this.toolStripSeparator6,
             this.SettingToolStripMenuItem,
             this.toolStripSeparator3,
             this.FileStripMenuItem,
@@ -71,7 +75,7 @@ namespace USBMonitor
             this.toolStripSeparator1,
             this.ExitXToolStripMenuItem});
             this.niconMenu.Name = "niconMenu";
-            this.niconMenu.Size = new System.Drawing.Size(182, 218);
+            this.niconMenu.Size = new System.Drawing.Size(182, 250);
             this.niconMenu.TabStop = true;
             // 
             // BlogMenuItem
@@ -142,6 +146,18 @@ namespace USBMonitor
             this.ExitXToolStripMenuItem.Text = "退出 (&X)";
             this.ExitXToolStripMenuItem.Click += new System.EventHandler(this.ExitXToolStripMenuItem_Click);
             // 
+            // stop
+            // 
+            this.stop.Name = "stop";
+            this.stop.Size = new System.Drawing.Size(181, 26);
+            this.stop.Text = "停用";
+            this.stop.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(178, 6);
+            // 
             // Host
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -172,5 +188,7 @@ namespace USBMonitor
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem BlogMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem stop;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
     }
 }

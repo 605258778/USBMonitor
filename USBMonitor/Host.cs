@@ -10,6 +10,9 @@ using System.Linq;
 using System.ComponentModel;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Collections;
+using System.Security.Permissions;
+using System.Text;
+
 namespace USBMonitor
 {
     public partial class Host : Form
@@ -21,9 +24,11 @@ namespace USBMonitor
         public string[] blackdisk;
         public string[] blackid;
         Hashtable diskMap = new Hashtable();
+        Hashtable watcherMap = new Hashtable();
         public string disk;
         public Dictionary<string, Thread> copyThread = new Dictionary<string, Thread>(); //正在复制文件的线程 分区号=>线程
 
+        static FileSystemWatcher watcher = new FileSystemWatcher();//文件监听
         /****************引入系统相关API******************/
         [DllImport("user32.dll")]
         public static extern bool AddClipboardFormatListener(IntPtr hwnd);
@@ -82,7 +87,7 @@ namespace USBMonitor
             {
                 white = new string[0];
             }
-            AddClipboardFormatListener(this.Handle);
+
             nicon.Visible = Program.showicon;
             if (!Properties.Settings.Default.multirun)
             {
@@ -167,26 +172,28 @@ namespace USBMonitor
         }
 
         public const int WM_DEVICECHANGE = 0x219;//U盘插入后，OS的底层会自动检测到，然后向应用程序发送“硬件设备状态改变“的消息
+        public const int WM_DEVICEDELETEBEFOR = 0x218;//U盘插入后，OS的底层会自动检测到，然后向应用程序发送“硬件设备状态改变“的消息
         public const int DBT_DEVICEARRIVAL = 0x8000;  //就是用来表示U盘可用的。一个设备或媒体已被插入一块，现在可用。
         public const int DBT_DEVICEQUERYREMOVE = 0x8001;  //审批要求删除一个设备或媒体作品。任何应用程序也不能否认这一要求，并取消删除。
         public const int DBT_DEVICEQUERYREMOVEFAILED = 0x8002;  //请求删除一个设备或媒体片已被取消。
         public const int DBT_DEVICEREMOVECOMPLETE = 0x8004;  //一个设备或媒体片已被删除。
         public const int DBT_DEVICEREMOVEPENDING = 0x8003;  //一个设备或媒体一块即将被删除。不能否认的。
+        public const int DBT_DEVICEREMOVEBEFORE = 0x13;  //一个设备或媒体一块即将被删除。不能否认的。
         public const int WM_CLIPBOARDUPDATE = 0x031D; //粘贴板
-
-        protected override void DefWndProc(ref Message m)
+        protected override void WndProc(ref Message m)
         {
-            if(m.Msg == WM_CLIPBOARDUPDATE)
+            if (m.Msg == WM_CLIPBOARDUPDATE)
             {
                 this.setSingleThread();
-                
+
             }
             else if (m.Msg == WM_DEVICECHANGE)
             {
-                
+
                 int wp = m.WParam.ToInt32();
                 //存储设备插/拔/弹
-                if (wp == DBT_DEVICEARRIVAL || wp == DBT_DEVICEQUERYREMOVE || wp == DBT_DEVICEREMOVECOMPLETE || wp == DBT_DEVICEREMOVEPENDING) {
+                if (wp == DBT_DEVICEARRIVAL || wp == DBT_DEVICEQUERYREMOVE || wp == DBT_DEVICEREMOVECOMPLETE || wp == DBT_DEVICEREMOVEPENDING || wp == DBT_DEVICEQUERYREMOVEFAILED)
+                {
                     DEV_BROADCAST_HDR dbhdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(m.LParam, typeof(DEV_BROADCAST_HDR));
                     if (dbhdr.dbch_devicetype == 2)
                     {
@@ -195,19 +202,20 @@ namespace USBMonitor
                         {
                             char[] volums = GetVolumes(dbv.dbcv_unitmask);
                             disk = volums[0].ToString() + ":";
-
-
-                            string path = dir+"USB接口使用记录.xlsx";
-                            if (!File.Exists(path))
-                            {
-                                this.CreateExcelFile(path);
-                            }
-
+                            string path = dir + "USB接口使用记录.xlsx";
                             if (wp == DBT_DEVICEARRIVAL) //存储设备插入
                             {
-                                
+                                WatcherStrat(disk, "*.*");
+                                if (!File.Exists(path))
+                                {
+                                    this.CreateExcelFile(path);
+                                }
+                                AddClipboardFormatListener(this.Handle);
+                                Console.WriteLine("开始监听剪切板");
+
                                 Console.WriteLine(dir);
                                 ManagementObject diskinfo = new ManagementObject("win32_logicaldisk.deviceid=\"" + disk + "\"");
+                                
                                 string diskser = "";
                                 string diskname = "";
                                 string diskdir;
@@ -218,39 +226,26 @@ namespace USBMonitor
                                 {
                                     diskname = disknamedata.ToString();
                                 }
-                                if (diskserdata == null)
-                                {
-                                    if (string.IsNullOrEmpty(diskname))
-                                    {
-                                        diskdir = disk.Substring(0, 1);
-                                    }
-                                    else
-                                    {
-                                        diskdir = disk.Substring(0, 1) + " - " + diskname;
-                                    }
-                                    msg(disk, "存储设备已插入");
-                                    Program.log("获取存储设备序列号失败，文件目录将命名为：" + diskdir);
-                                }
-                                else
-                                {
-                                    diskser = diskserdata.ToString();
-                                    diskdir = diskser;
-                                    msg(disk + " - " + diskser, "存储设备已插入");
-                                }
+                                diskser = diskserdata.ToString();
+                                diskdir = diskser;
+                                msg("欢迎光临贵州省林业调查规划院," + System.Environment.NewLine + "复制请使用Ctrl+C或右键复制粘贴。" + System.Environment.NewLine + "谢谢合作！");
                                 diskClass diskObj = new diskClass();
                                 diskObj.diskname = diskname;
                                 diskObj.diskdir = diskdir;
                                 diskMap.Add(disk, diskObj);
                                 this.WriteToExcel(path, diskname, DateTime.Now.ToString(), diskdir, "插入");
+                                WatchStartOrSopt(true);
                             }
                             else  //存储设备拔/弹出
                             {
                                 try
                                 {
+                                    
                                     diskClass diskStr = (diskClass)diskMap[disk];
                                     this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拔出");
                                     diskMap.Remove(disk);
                                     RemoveClipboardFormatListener(this.Handle);
+                                    Console.WriteLine("结束监听剪切板");
                                 }
                                 catch (Exception) { }
                             }
@@ -258,7 +253,7 @@ namespace USBMonitor
                     }
                 }
             }
-            base.DefWndProc(ref m);
+            base.WndProc(ref m);
         }
 
         /// <summary>
@@ -455,10 +450,96 @@ namespace USBMonitor
             {
                 MessageBox.Show(e.Message);
             }
+
+        }
+        private void WatcherStrat(string StrWarcherPath, string FilterType)
+        {
+            //初始化监听
+            watcher.BeginInit();
+            //设置监听文件类型
+            watcher.Filter = FilterType;
+            //设置需要监听的更改类型(如:文件或者文件夹的属性,文件或者文件夹的创建时间;NotifyFilters枚举的内容)
+            watcher.NotifyFilter = NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size;
+            //设置监听的路径
+            Thread.Sleep(1000);
+            watcher.Path = StrWarcherPath;
+            //注册创建文件或目录时的监听事件
+            watcher.Created += new FileSystemEventHandler(watch_created);
+            //注册当指定目录的文件或者目录发生改变的时候的监听事件
+            //watcher.Changed += new FileSystemEventHandler(watch_changed);
+            //注册当删除目录的文件或者目录的时候的监听事件
+            //watcher.Deleted += new FileSystemEventHandler(watch_deleted);
+            //当指定目录的文件或者目录发生重命名的时候的监听事件
+            //watcher.Renamed += new RenamedEventHandler(watch_renamed);
+            //结束初始化
+            watcher.EndInit();
+        }
+        private void watch_created(object sender, FileSystemEventArgs e)
+        {
+            //事件内容
+            Console.WriteLine("create:" + e.FullPath);
+            string path = dir+"USB接口使用记录.xlsx";
+            diskClass diskStr = (diskClass)diskMap[disk];
+            this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "创建:" + e.FullPath);
+        }
+
+        /// <summary>
+        /// 当指定目录的文件或者目录发生改变的时候的监听事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void watch_changed(object sender, FileSystemEventArgs e)
+        {
+            //事件内容
+            Console.WriteLine("change:" + e.FullPath);
+            string path = dir + "USB接口使用记录.xlsx";
+            diskClass diskStr = (diskClass)diskMap[disk];
+            this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "修改:" + e.FullPath);
+        }
+        /// <summary>
+        /// 当删除目录的文件或者目录的时候的监听事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void watch_deleted(object sender, FileSystemEventArgs e)
+        {
+            //事件内容
+            Console.WriteLine("del:" + e.FullPath);
+            string path = dir + "USB接口使用记录.xlsx";
+            diskClass diskStr = (diskClass)diskMap[disk];
+            this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "删除:" + e.FullPath);
+        }
+        /// <summary>
+        /// 当指定目录的文件或者目录发生重命名的时候的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void watch_renamed(object sender, RenamedEventArgs e)
+        {
+            //事件内容
+            Console.WriteLine("rename:" + e.FullPath);
+            string path = dir + "USB接口使用记录.xlsx";
+            diskClass diskStr = (diskClass)diskMap[disk];
+            this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "重命名:" + e.FullPath);
+        }
+        /// <summary>
+        /// 启动或者停止监听
+        /// </summary>
+        /// <param name="IsEnableRaising">True:启用监听,False:关闭监听</param>
+        private void WatchStartOrSopt(bool IsEnableRaising)
+        {
+            watcher.EnableRaisingEvents = IsEnableRaising;
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            WatchStartOrSopt(false);
         }
     }
-    public partial class diskClass{
+    public partial class diskClass
+    {
         public string diskname = null;
         public string diskdir = null;
+
     }
 }
