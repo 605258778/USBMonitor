@@ -28,7 +28,7 @@ namespace USBMonitor
         public string disk;
         public Dictionary<string, Thread> copyThread = new Dictionary<string, Thread>(); //正在复制文件的线程 分区号=>线程
 
-        static FileSystemWatcher watcher = new FileSystemWatcher();//文件监听
+        static FileSystemWatcher watcher = new FileSystemWatcher();//    文件监听
         /****************引入系统相关API******************/
         [DllImport("user32.dll")]
         public static extern bool AddClipboardFormatListener(IntPtr hwnd);
