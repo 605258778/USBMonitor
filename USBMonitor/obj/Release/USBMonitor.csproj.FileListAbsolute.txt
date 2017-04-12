@@ -10,3 +10,12 @@ F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.Properties.Resources.r
 F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csproj.GenerateResource.Cache
 F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe
 F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.pdb
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\DeviceManagement.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\ReactiveUI.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\Splat.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Core.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Interfaces.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Linq.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Windows.Threading.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.PlatformServices.dll
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Core.xml

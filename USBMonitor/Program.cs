@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
+using DeviceManagement;
+using ReactiveUI;
 
 namespace USBMonitor
 {
@@ -10,7 +12,7 @@ namespace USBMonitor
         public static bool showicon = true;
         public static EventLog logger = new EventLog();
         public static System.Drawing.Icon ico = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-
+        public static ReactiveCommand<object> Eject { get; private set; }
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -63,12 +65,41 @@ namespace USBMonitor
                 {
                     log("程序遇到未处理的异常：" + e.ExceptionObject.ToString());
                 });
+                /**Thread thread2 = new Thread(new ThreadStart(usbInit));
+                thread2.SetApartmentState(ApartmentState.STA);     //
+                thread2.Start();**/
                 Application.Run(new Host());
+                
             }
             catch(Exception ex)
             {
                 log("程序遇到致命异常：" + ex.ToString(), 2);
             }
+        }
+        public static void usbInit()
+        {
+            var handler = new VolumeNotificationHandler();
+            handler.VolumeArrival += handler_VolumeArrival;
+            handler.VolumeRemoveComplete += handler_VolumeRemoveComplete;
+            handler.DeviceArrival += handler_DeviceArrival;
+            handler.DeviceRemoveComplete += handler_DeviceRemoveComplete;
+            var deviceNotification = new DeviceNotification { NotificationHandler = handler };
+            deviceNotification.Register(DeviceType.LogicalVolume);
+            Eject = ReactiveCommand.Create();
+            Eject.Subscribe(_ => RemoveDriveTools.EjectImpl(@"G:"));
+        }
+      
+        public static void handler_VolumeArrival(object sender, DeviceNotificationEventArgs e)
+        {
+        }
+        public static void handler_VolumeRemoveComplete(object sender, DeviceNotificationEventArgs e)
+        {
+        }
+        public static void handler_DeviceArrival(object sender, DeviceNotificationEventArgs e)
+        {
+        }
+        public static void handler_DeviceRemoveComplete(object sender, DeviceNotificationEventArgs e)
+        {
         }
 
         /// <summary>

@@ -7,11 +7,11 @@ using System.Management;
 using System.Threading;
 using System.Diagnostics;
 using System.Linq;
-using System.ComponentModel;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Collections;
-using System.Security.Permissions;
 using System.Text;
+using DeviceManagement;
+using ReactiveUI;
 
 namespace USBMonitor
 {
@@ -23,19 +23,51 @@ namespace USBMonitor
         public string[] black;
         public string[] blackdisk;
         public string[] blackid;
+        public const int DIF_REMOVE = (0x00000005);
+        public string diskser = "";
+        public string diskname = "";
         Hashtable diskMap = new Hashtable();
         Hashtable watcherMap = new Hashtable();
         public string disk;
-        public Dictionary<string, Thread> copyThread = new Dictionary<string, Thread>(); //正在复制文件的线程 分区号=>线程
+        public string filePath;
+        public string copytime;
+        public string copyname;
+        public string copydiskdir;
+        
 
+        ManagementObject diskinfo;
+        public string path;
+        public ReactiveCommand<object> Eject { get; private set; }
         static FileSystemWatcher watcher = new FileSystemWatcher();//文件监听
         /****************引入系统相关API******************/
         [DllImport("user32.dll")]
         public static extern bool AddClipboardFormatListener(IntPtr hwnd);
-
         [DllImport("user32.dll")]
         public static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
-
+        //释放设备的访问
+        [DllImport("setupapi.dll", SetLastError = true)]
+        public static extern IntPtr SetupDiGetClassDevs(ref Guid ClassGuid, uint Enumerator, IntPtr HwndParent, DIGCF Flags);
+        public const int DIGCF_ALLCLASSES = (0x00000004);
+        public const int DIGCF_PRESENT = (0x00000002);
+        public const int INVALID_HANDLE_VALUE = -1;
+        public const int SPDRP_DEVICEDESC = (0x00000000);
+        public const int MAX_DEV_LEN = 200;
+        public const int DEVICE_NOTIFY_WINDOW_HANDLE = (0x00000000);
+        public const int DEVICE_NOTIFY_SERVICE_HANDLE = (0x00000001);
+        public const int DEVICE_NOTIFY_ALL_INTERFACE_CLASSES = (0x00000004);
+        public const int DBT_DEVTYP_DEVICEINTERFACE = (0x00000005);
+        public const int DBT_DEVNODES_CHANGED = (0x0007);
+        public const int WM_DEVICECHANGE = (0x0219);
+        public enum DIGCF
+        {
+            DIGCF_DEFAULT = 0x1,
+            DIGCF_PRESENT = 0x2,
+            DIGCF_ALLCLASSES = 0x4,
+            DIGCF_PROFILE = 0x8,
+            DIGCF_DEVICEINTERFACE = 0x10
+        }
+        IntPtr hDevInfo;
+        Guid guidHID = Guid.Empty;
         public Host()
         {
             InitializeComponent();
@@ -170,8 +202,6 @@ namespace USBMonitor
             nicon.Dispose();
             Environment.Exit(0);
         }
-
-        public const int WM_DEVICECHANGE = 0x219;//U盘插入后，OS的底层会自动检测到，然后向应用程序发送“硬件设备状态改变“的消息
         public const int WM_DEVICEDELETEBEFOR = 0x218;//U盘插入后，OS的底层会自动检测到，然后向应用程序发送“硬件设备状态改变“的消息
         public const int DBT_DEVICEARRIVAL = 0x8000;  //就是用来表示U盘可用的。一个设备或媒体已被插入一块，现在可用。
         public const int DBT_DEVICEQUERYREMOVE = 0x8001;  //审批要求删除一个设备或媒体作品。任何应用程序也不能否认这一要求，并取消删除。
@@ -185,11 +215,9 @@ namespace USBMonitor
             if (m.Msg == WM_CLIPBOARDUPDATE)
             {
                 this.setSingleThread();
-
             }
             else if (m.Msg == WM_DEVICECHANGE)
             {
-
                 int wp = m.WParam.ToInt32();
                 //存储设备插/拔/弹
                 if (wp == DBT_DEVICEARRIVAL || wp == DBT_DEVICEQUERYREMOVE || wp == DBT_DEVICEREMOVECOMPLETE || wp == DBT_DEVICEREMOVEPENDING || wp == DBT_DEVICEQUERYREMOVEFAILED)
@@ -202,24 +230,20 @@ namespace USBMonitor
                         {
                             char[] volums = GetVolumes(dbv.dbcv_unitmask);
                             disk = volums[0].ToString() + ":";
-                            string path = dir + "USB接口使用记录.xlsx";
+                            path = dir + "USB接口使用记录"+ DateTime.Today.Year + DateTime.Today.Month + DateTime.Today.Day + ".xlsx";
                             if (wp == DBT_DEVICEARRIVAL) //存储设备插入
                             {
                                 WatcherStrat(disk, "*.*");
+                                hDevInfo = SetupDiGetClassDevs(ref guidHID, 0, IntPtr.Zero, DIGCF.DIGCF_PRESENT | DIGCF.DIGCF_DEVICEINTERFACE);
                                 if (!File.Exists(path))
                                 {
                                     this.CreateExcelFile(path);
                                 }
                                 AddClipboardFormatListener(this.Handle);
                                 Console.WriteLine("开始监听剪切板");
-
                                 Console.WriteLine(dir);
-                                ManagementObject diskinfo = new ManagementObject("win32_logicaldisk.deviceid=\"" + disk + "\"");
-                                
-                                string diskser = "";
-                                string diskname = "";
+                                diskinfo = new ManagementObject("win32_logicaldisk.deviceid=\"" + disk + "\"");
                                 string diskdir;
-
                                 object diskserdata = diskinfo.Properties["VolumeSerialNumber"].Value;
                                 object disknamedata = diskinfo.Properties["VolumeName"].Value;
                                 if (disknamedata != null)
@@ -228,19 +252,23 @@ namespace USBMonitor
                                 }
                                 diskser = diskserdata.ToString();
                                 diskdir = diskser;
-                                msg("欢迎光临贵州省林业调查规划院," + System.Environment.NewLine + "复制请使用Ctrl+C或右键复制粘贴。" + System.Environment.NewLine + "谢谢合作！");
+                                msg("欢迎光临贵州省林业调查规划院," + System.Environment.NewLine + "复制请使用Ctrl+C或右键复制粘贴。" + System.Environment.NewLine + "若弹出时提示占用，请右击停用。谢谢合作！");
                                 diskClass diskObj = new diskClass();
+                                if (diskname == "" || diskname == null)
+                                {
+                                    diskname = "可移动磁盘（" + disk + ")";
+                                }
                                 diskObj.diskname = diskname;
                                 diskObj.diskdir = diskdir;
                                 diskMap.Add(disk, diskObj);
                                 this.WriteToExcel(path, diskname, DateTime.Now.ToString(), diskdir, "插入");
+                                hDevInfo = SetupDiGetClassDevs(ref guidHID, 0, IntPtr.Zero, DIGCF.DIGCF_PRESENT | DIGCF.DIGCF_DEVICEINTERFACE);
                                 WatchStartOrSopt(true);
                             }
                             else  //存储设备拔/弹出
                             {
                                 try
                                 {
-                                    
                                     diskClass diskStr = (diskClass)diskMap[disk];
                                     this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拔出");
                                     diskMap.Remove(disk);
@@ -273,7 +301,6 @@ namespace USBMonitor
                     Volumes.Add((char)('A' + i));
                 }
             }
-
             return Volumes.ToArray();
         }
 
@@ -282,7 +309,6 @@ namespace USBMonitor
             EnableToolStripMenuItem.Checked = !EnableToolStripMenuItem.Checked;
             EnableToolStripMenuItem.Text = EnableToolStripMenuItem.Checked ? "已启用 (&E)" : "未启用 (&E)";
         }
-
         [StructLayout(LayoutKind.Sequential)]
         struct DEV_BROADCAST_HDR
         {
@@ -382,7 +408,7 @@ namespace USBMonitor
             range.Font.Size = 15;
             range.Font.Name = "黑体";
             worksheet.Name = "record";
-            range.ColumnWidth = 15;
+            range.ColumnWidth = 25;
             range.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
             range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
             //headline  
@@ -398,7 +424,6 @@ namespace USBMonitor
 
         private void WriteToExcel(string excelName, string USBName, string occurDate, string serial, string content)
         {
-            //open  
             object Nothing = System.Reflection.Missing.Value;
             var app = new Excel.Application();
             app.Visible = false;
@@ -408,6 +433,10 @@ namespace USBMonitor
             Console.WriteLine(excelName + USBName + occurDate + serial + content);
             //get activate sheet max row count  
             int maxrow = mysheet.UsedRange.Rows.Count + 1;
+            Excel.Range range = (Excel.Range)mysheet.get_Range("A"+ maxrow, "D"+ maxrow);
+            range.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            range.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+
             mysheet.Cells[maxrow, 1] = USBName;
             mysheet.Cells[maxrow, 2] = occurDate;
             mysheet.Cells[maxrow, 3] = serial;
@@ -424,7 +453,7 @@ namespace USBMonitor
             thread1.SetApartmentState(ApartmentState.STA);     //<--
             thread1.Start();
         }
-        public void getData()
+        public  void getData()
         {
             try
             {
@@ -436,15 +465,22 @@ namespace USBMonitor
                     if (fileIList.Count > 0)
                     {
                         Console.WriteLine(fileIList[0]);
-                        String path = fileIList[0].ToString();
-                        if (path.StartsWith(disk))
+                        filePath = fileIList[0].ToString();
+                       if (filePath.StartsWith(disk))
                         {
                             Console.WriteLine("U盘数据被复制");
                             diskClass diskStr = (diskClass)diskMap[disk];
-                            this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "复制:"+ path);
+                            if (copytime!= DateTime.Now.ToString() || copyname != filePath || copydiskdir != diskStr.diskdir)
+                            {
+                                copyname = filePath;
+                                copytime = DateTime.Now.ToString();
+                                copydiskdir = diskStr.diskdir;
+                                this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拷入:" + filePath);
+                            }
                         }
                     }
                 }
+                
             }
             catch (Exception e)
             {
@@ -478,9 +514,28 @@ namespace USBMonitor
         {
             //事件内容
             Console.WriteLine("create:" + e.FullPath);
-            string path = dir+"USB接口使用记录.xlsx";
             diskClass diskStr = (diskClass)diskMap[disk];
-            this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "创建:" + e.FullPath);
+            if (filePath == e.FullPath)
+            {
+                if (copytime != DateTime.Now.ToString() || copyname != filePath || copydiskdir != diskStr.diskdir)
+                {
+                    copyname = filePath;
+                    copytime = DateTime.Now.ToString();
+                    copydiskdir = diskStr.diskdir;
+                    this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拷入:" + e.FullPath);
+                }
+            }
+            else
+            {
+                if (copytime != DateTime.Now.ToString() || copyname != filePath || copydiskdir != diskStr.diskdir)
+                {
+                    copyname = filePath;
+                    copytime = DateTime.Now.ToString();
+                    copydiskdir = diskStr.diskdir;
+                    this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拷出:" + e.FullPath);
+                }
+                
+            }
         }
 
         /// <summary>
@@ -492,7 +547,6 @@ namespace USBMonitor
         {
             //事件内容
             Console.WriteLine("change:" + e.FullPath);
-            string path = dir + "USB接口使用记录.xlsx";
             diskClass diskStr = (diskClass)diskMap[disk];
             this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "修改:" + e.FullPath);
         }
@@ -505,7 +559,6 @@ namespace USBMonitor
         {
             //事件内容
             Console.WriteLine("del:" + e.FullPath);
-            string path = dir + "USB接口使用记录.xlsx";
             diskClass diskStr = (diskClass)diskMap[disk];
             this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "删除:" + e.FullPath);
         }
@@ -518,7 +571,6 @@ namespace USBMonitor
         {
             //事件内容
             Console.WriteLine("rename:" + e.FullPath);
-            string path = dir + "USB接口使用记录.xlsx";
             diskClass diskStr = (diskClass)diskMap[disk];
             this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "重命名:" + e.FullPath);
         }
@@ -530,16 +582,15 @@ namespace USBMonitor
         {
             watcher.EnableRaisingEvents = IsEnableRaising;
         }
-
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             WatchStartOrSopt(false);
+            //RemoveDriveTools.EjectImpl(@"G:");
         }
     }
     public partial class diskClass
     {
         public string diskname = null;
         public string diskdir = null;
-
     }
 }
