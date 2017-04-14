@@ -19,3 +19,8 @@ F:\workSpace\USBMonitor\USBMonitor\bin\Debug\System.Reactive.Core.xml
 F:\workSpace\USBMonitor\USBMonitor\obj\Debug\USBMonitor.exe
 F:\workSpace\USBMonitor\USBMonitor\obj\Debug\USBMonitor.pdb
 F:\workSpace\USBMonitor\USBMonitor\obj\Debug\USBMonitor.csprojResolveAssemblyReference.cache
+F:\workSpace\USBMonitor\USBMonitor\obj\Debug\USBMonitor.TrustInfo.xml
+F:\workSpace\USBMonitor\USBMonitor\obj\Debug\USBMonitor.exe.manifest
+F:\workSpace\USBMonitor\USBMonitor\bin\Debug\USBMonitor.exe.manifest
+F:\workSpace\USBMonitor\USBMonitor\bin\Debug\USBMonitor.application
+F:\workSpace\USBMonitor\USBMonitor\obj\Debug\USBMonitor.application

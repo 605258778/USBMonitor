@@ -125,14 +125,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="USBMonitor.exe" size="71096">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="USBMonitor.exe" size="73144">
       <assemblyIdentity name="USBMonitor" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>p3Si2paodkCekXE21sf3NdQklo5oMw7fSgqHiCdK7+U=</dsig:DigestValue>
+        <dsig:DigestValue>SfHa4+FhXQmawBh66LEOiufTtT3oQ0ObGyaTOpiUcfs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

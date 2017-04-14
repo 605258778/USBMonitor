@@ -19,3 +19,8 @@ F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Linq.dll
 F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Windows.Threading.dll
 F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.PlatformServices.dll
 F:\workSpace\USBMonitor\USBMonitor\bin\Release\System.Reactive.Core.xml
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.exe.manifest
+F:\workSpace\USBMonitor\USBMonitor\bin\Release\USBMonitor.application
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.TrustInfo.xml
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe.manifest
+F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.application

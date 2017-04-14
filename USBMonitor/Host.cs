@@ -441,11 +441,23 @@ namespace USBMonitor
             mysheet.Cells[maxrow, 2] = occurDate;
             mysheet.Cells[maxrow, 3] = serial;
             mysheet.Cells[maxrow, 4] = content;
-            mybook.Save();
-            mybook.Close(false, Type.Missing, Type.Missing);
-            mybook = null;
             //quit excel app  
-            app.Quit();
+            try
+            {
+                mybook.Save();
+            }
+            catch
+            {
+                Console.WriteLine("保存错误");
+            }
+            finally
+            {
+                mybook.Close(false, Type.Missing, Type.Missing);
+                mybook = null;
+                app.Quit();
+                app = null;
+                GC.Collect();
+            }
         }
         public void setSingleThread()
         {
@@ -470,10 +482,10 @@ namespace USBMonitor
                         {
                             Console.WriteLine("U盘数据被复制");
                             diskClass diskStr = (diskClass)diskMap[disk];
-                            if (copytime!= DateTime.Now.ToString() || copyname != filePath || copydiskdir != diskStr.diskdir)
+                            if (copytime!= DateTime.Now.ToString().Substring(0, 14) || copyname != filePath || copydiskdir != diskStr.diskdir)
                             {
                                 copyname = filePath;
-                                copytime = DateTime.Now.ToString();
+                                copytime = DateTime.Now.ToString().Substring(0, 14);
                                 copydiskdir = diskStr.diskdir;
                                 this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拷入:" + filePath);
                             }
@@ -517,20 +529,20 @@ namespace USBMonitor
             diskClass diskStr = (diskClass)diskMap[disk];
             if (filePath == e.FullPath)
             {
-                if (copytime != DateTime.Now.ToString() || copyname != filePath || copydiskdir != diskStr.diskdir)
+                if (copytime != DateTime.Now.ToString().Substring(0, 14) || copyname != filePath || copydiskdir != diskStr.diskdir)
                 {
                     copyname = filePath;
-                    copytime = DateTime.Now.ToString();
+                    copytime = DateTime.Now.ToString().Substring(0, 14);
                     copydiskdir = diskStr.diskdir;
                     this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拷入:" + e.FullPath);
                 }
             }
             else
             {
-                if (copytime != DateTime.Now.ToString() || copyname != filePath || copydiskdir != diskStr.diskdir)
+                if (copytime != DateTime.Now.ToString().Substring(0, 14) || copyname != filePath || copydiskdir != diskStr.diskdir)
                 {
                     copyname = filePath;
-                    copytime = DateTime.Now.ToString();
+                    copytime = DateTime.Now.ToString().Substring(0, 14);
                     copydiskdir = diskStr.diskdir;
                     this.WriteToExcel(path, diskStr.diskname, DateTime.Now.ToString(), diskStr.diskdir, "拷出:" + e.FullPath);
                 }
