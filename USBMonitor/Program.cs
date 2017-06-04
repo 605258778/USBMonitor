@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
-using DeviceManagement;
-using ReactiveUI;
-
 namespace USBMonitor
 {
     static class Program
@@ -12,7 +10,6 @@ namespace USBMonitor
         public static bool showicon = true;
         public static EventLog logger = new EventLog();
         public static System.Drawing.Icon ico = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-        public static ReactiveCommand<object> Eject { get; private set; }
         /// <summary>
         /// 应用程序的主入口点。
         /// </summary>
@@ -75,31 +72,6 @@ namespace USBMonitor
             {
                 log("程序遇到致命异常：" + ex.ToString(), 2);
             }
-        }
-        public static void usbInit()
-        {
-            var handler = new VolumeNotificationHandler();
-            handler.VolumeArrival += handler_VolumeArrival;
-            handler.VolumeRemoveComplete += handler_VolumeRemoveComplete;
-            handler.DeviceArrival += handler_DeviceArrival;
-            handler.DeviceRemoveComplete += handler_DeviceRemoveComplete;
-            var deviceNotification = new DeviceNotification { NotificationHandler = handler };
-            deviceNotification.Register(DeviceType.LogicalVolume);
-            Eject = ReactiveCommand.Create();
-            Eject.Subscribe(_ => RemoveDriveTools.EjectImpl(@"G:"));
-        }
-      
-        public static void handler_VolumeArrival(object sender, DeviceNotificationEventArgs e)
-        {
-        }
-        public static void handler_VolumeRemoveComplete(object sender, DeviceNotificationEventArgs e)
-        {
-        }
-        public static void handler_DeviceArrival(object sender, DeviceNotificationEventArgs e)
-        {
-        }
-        public static void handler_DeviceRemoveComplete(object sender, DeviceNotificationEventArgs e)
-        {
         }
 
         /// <summary>

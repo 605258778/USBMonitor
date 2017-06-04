@@ -34,7 +34,20 @@ namespace USBMonitor.Properties {
                 this["dir"] = value;
             }
         }
-        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string nameImput
+        {
+            get
+            {
+                return ((string)(this["nameImput"]));
+            }
+            set
+            {
+                this["nameImput"] = value;
+            }
+        }
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
