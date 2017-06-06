@@ -29,14 +29,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="USBMonitor.exe" size="78264">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="USBMonitor.exe" size="78776">
       <assemblyIdentity name="USBMonitor" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Js1vkasr2pllAAUS2ZwpzgzqXsPyIIdthSzZBv3aM3s=</dsig:DigestValue>
+        <dsig:DigestValue>38i6ChgNVFbl1j9XjM+7CD14Y0OXCXvQREegz7uqiRU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

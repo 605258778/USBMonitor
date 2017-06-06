@@ -306,7 +306,9 @@ namespace USBMonitor
                                     diskMap.Remove(disk);
                                     if (watcher.EnableRaisingEvents != false)
                                     {
+                                        EndWatch();
                                         WatchStartOrSopt(false);
+                                        Console.WriteLine("直接拔出");
                                     }
                                     Console.WriteLine("结束监听剪切板");
                                 }
