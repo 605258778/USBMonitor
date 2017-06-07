@@ -35,8 +35,8 @@
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>SKvPrSR7Dok3g+t3uGuPhQsEXQ8p7sS+XNFNK7/ubXE=</dsig:DigestValue>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>UIO+ox4IWTNE+xAsXUPmucEK9ck=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -45,17 +45,17 @@
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>3/9NZUVIyzPeHw55crfJPtYN3WoVOfzi4rNHCshJwrc=</dsig:DigestValue>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>R4fdIhZXR476ZJXQRqDjRTL+6Uo=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="USBMonitor.exe.config" size="2624">
+  <file name="USBMonitor.exe.config" size="2630">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>Tk8Zo+65IP3l8YuiqA+Rcei6X32YnqUQHu7vlvL/yuA=</dsig:DigestValue>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>S3MVquYsiz0vvCjszsimrAYAwWo=</dsig:DigestValue>
     </hash>
   </file>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">

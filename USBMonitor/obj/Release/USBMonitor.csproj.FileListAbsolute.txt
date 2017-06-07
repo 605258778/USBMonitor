@@ -14,5 +14,4 @@ F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe.manifest
 F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.application
 F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.exe
 F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.pdb
-F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.csprojResolveAssemblyReference.cache
 F:\workSpace\USBMonitor\USBMonitor\obj\Release\USBMonitor.NameFrom.resources
